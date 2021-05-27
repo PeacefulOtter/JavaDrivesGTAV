@@ -1,4 +1,4 @@
-package com.peacefulotter.javadrivesgta.ml.cnn_layerss;
+package com.peacefulotter.javadrivesgta.ml.cnn_layers;
 
 import com.peacefulotter.javadrivesgta.maths.Matrix2D;
 

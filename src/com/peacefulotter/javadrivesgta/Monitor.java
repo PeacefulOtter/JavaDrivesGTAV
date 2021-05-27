@@ -1,7 +1,7 @@
 package com.peacefulotter.javadrivesgta;
 
-import com.peacefulotter.javadrivesgta.processing.ImageConverter;
-import com.peacefulotter.javadrivesgta.processing.ImageEffect;
+import com.peacefulotter.javadrivesgta.img_processing.ImageConverter;
+import com.peacefulotter.javadrivesgta.img_processing.ImageEffect;
 import com.peacefulotter.javadrivesgta.recording.TrainingImage;
 import com.peacefulotter.javadrivesgta.recording.TrainingVideo;
 import com.peacefulotter.javadrivesgta.utils.Settings;

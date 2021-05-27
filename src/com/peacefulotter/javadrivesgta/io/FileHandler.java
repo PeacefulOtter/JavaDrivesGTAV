@@ -1,6 +1,7 @@
 package com.peacefulotter.javadrivesgta.io;
 
-import com.peacefulotter.javadrivesgta.processing.ImageConverter;
+import com.peacefulotter.javadrivesgta.img_processing.ImageConverter;
+import com.peacefulotter.javadrivesgta.maths.Matrix2D;
 import com.peacefulotter.javadrivesgta.recording.TrainingImage;
 import com.peacefulotter.javadrivesgta.recording.TrainingVideo;
 import com.peacefulotter.javadrivesgta.utils.Settings;
@@ -9,7 +10,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
+import java.util.*;
 
 import static com.peacefulotter.javadrivesgta.utils.Settings.CAPTURE_WIDTH;
 
@@ -18,6 +19,30 @@ public class FileHandler
     private InputStream getStream( String fileName )
     {
         return Objects.requireNonNull( getClass().getResourceAsStream( fileName ) );
+    }
+
+    public static List<Map<String, Matrix2D>> loadTrainingData( int from, int to )
+    {
+        List<Map<String, Matrix2D>> data = new ArrayList<>();
+
+        for ( int i = from; i < to; i++ )
+        {
+            TrainingVideo video = importFromFile( "dataset/out" + i + ".txt" );
+
+            for ( int j = 0; j < video.getSize(); j++ )
+            {
+                Map<String, Matrix2D> sample = new HashMap<>();
+                TrainingImage image = video.popImage();
+                sample.put( "X", ImageConverter.Buffered2Matrix( image.getImage() ) );
+                Matrix2D mat = new Matrix2D( 2, 1 );
+                mat.setAt( 0, 0, image.getAcceleration() );
+                mat.setAt( 1, 0, image.getDirection() );
+                sample.put( "Y", mat);
+                data.add( sample );
+            }
+        }
+
+        return data;
     }
 
     public static TrainingVideo importFromFile( String fileName )

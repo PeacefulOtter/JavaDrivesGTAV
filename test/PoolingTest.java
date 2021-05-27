@@ -1,5 +1,5 @@
 import com.peacefulotter.javadrivesgta.maths.Matrix2D;
-import com.peacefulotter.javadrivesgta.ml.cnn_layerss.MaxPooling;
+import com.peacefulotter.javadrivesgta.ml.cnn_layers.MaxPooling;
 
 import java.util.List;
 

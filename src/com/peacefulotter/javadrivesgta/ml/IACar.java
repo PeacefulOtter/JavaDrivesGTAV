@@ -4,7 +4,9 @@ package com.peacefulotter.javadrivesgta.ml;
 import com.peacefulotter.javadrivesgta.maths.Matrix2D;
 import com.peacefulotter.javadrivesgta.ml.activation.ActivationFunc;
 import com.peacefulotter.javadrivesgta.ml.activation.Activations;
+import com.peacefulotter.javadrivesgta.ml.loss.Loss;
 
+import java.util.HashMap;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -14,9 +16,9 @@ import static com.peacefulotter.javadrivesgta.utils.Settings.CAPTURE_WIDTH;
 public class IACar
 {
     // Neural Network specifications (hyper parameters)
-    public static final int[] DIMENSIONS = new int[] {CAPTURE_WIDTH * CAPTURE_HEIGHT, 10, 2};
+    public static final int[] DIMENSIONS = new int[] {CAPTURE_WIDTH * CAPTURE_HEIGHT, 1000, 250, 30, 2};
     private static final ActivationFunc[] ACTIVATIONS = new ActivationFunc[] {
-            Activations.ReLU, Activations.HyperTan
+            Activations.ReLU, Activations.ReLU, Activations.ReLU, Activations.HyperTan
     };
 
     private NeuralNetwork nn;
@@ -57,17 +59,15 @@ public class IACar
         return nn.applyFunction( func, other.nn );
     }
 
-    /*public void trainIA()
+    public void trainIA( HashMap<String, Matrix2D> trainingData )
     {
-        HashMap<String, Matrix2D> hm = new Loader().loadDrivingData( DIMENSIONS[0], DIMENSIONS[DIMENSIONS.length - 1]);
-        Matrix2D X = hm.get( "X" );
-        Matrix2D Y = hm.get( "Y" );
+        Matrix2D X = trainingData.get( "X" );
+        Matrix2D Y = trainingData.get( "Y" );
 
         if ( X.cols != DIMENSIONS[ 0 ] ) throw new AssertionError();
 
         nn.train( X, Y, Loss.MSE, 1e-4, 250, 1, 10 );
-        // nextGeneration( new ArrayList<>(1) { { add(0); } }, population );
-    }*/
+    }
 
     public NeuralNetwork getCopyNN() { return new NeuralNetwork( nn ); }
 }

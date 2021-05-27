@@ -1,4 +1,4 @@
-package com.peacefulotter.javadrivesgta.processing;
+package com.peacefulotter.javadrivesgta.img_processing;
 
 import javafx.embed.swing.SwingFXUtils;
 
@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.image.*;
 
-import static com.peacefulotter.javadrivesgta.processing.ImageConverter.AWT2Buffered;
+import static com.peacefulotter.javadrivesgta.img_processing.ImageConverter.AWT2Buffered;
 import static com.peacefulotter.javadrivesgta.utils.Settings.CAPTURE_HEIGHT;
 import static com.peacefulotter.javadrivesgta.utils.Settings.CAPTURE_WIDTH;
 

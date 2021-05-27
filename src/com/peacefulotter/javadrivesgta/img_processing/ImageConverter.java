@@ -1,5 +1,6 @@
-package com.peacefulotter.javadrivesgta.processing;
+package com.peacefulotter.javadrivesgta.img_processing;
 
+import com.peacefulotter.javadrivesgta.maths.Matrix2D;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelWriter;
@@ -14,6 +15,10 @@ import static com.peacefulotter.javadrivesgta.utils.Settings.CAPTURE_WIDTH;
 
 public class ImageConverter
 {
+    public static Matrix2D Buffered2Matrix( BufferedImage img )
+    {
+        return Matrix2D.applyFunc( (mat, i, j) -> img.getRGB( j, i ), CAPTURE_HEIGHT, CAPTURE_WIDTH );
+    }
 
     public static byte[] Buffered2Bytes( BufferedImage img ) throws IOException
     {

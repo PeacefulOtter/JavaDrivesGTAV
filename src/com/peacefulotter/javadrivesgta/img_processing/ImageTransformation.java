@@ -1,4 +1,4 @@
-package com.peacefulotter.javadrivesgta.processing;
+package com.peacefulotter.javadrivesgta.img_processing;
 
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
