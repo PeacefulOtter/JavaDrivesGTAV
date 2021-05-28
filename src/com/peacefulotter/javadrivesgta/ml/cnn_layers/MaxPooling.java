@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
-public class MaxPooling
+public class MaxPooling implements CNNLayer
 {
     private final int kernelSize, stride, padding;
 
@@ -22,11 +22,7 @@ public class MaxPooling
         maxIndices = new ArrayDeque<>();
     }
 
-    private int bounded( int origin, int max )
-    {
-        return origin < 0 ? 0 : Math.min( origin, max );
-    }
-
+    @Override
     public List<Matrix2D> forward( List<Matrix2D> images )
     {
         maxIndices.clear();
@@ -61,7 +57,6 @@ public class MaxPooling
                     Matrix2D.ElemIndices maxPool = image.subMatrix( matX, matY, matWidth, matHeight ).max();
                     // store the max into then new matrix
                     DSImage.setAt( i++, j, maxPool.elem );
-                    System.out.println( (maxPool.x + matX) + " " + (maxPool.y+matY) );
                     // save the indices where the max was found, used in backprop
                     maxIndices.add( maxPool.x + matX );
                     maxIndices.add( maxPool.y + matY );
@@ -74,8 +69,8 @@ public class MaxPooling
         return downsampled;
     }
 
-
-    public List<Matrix2D> backprop( List<Matrix2D> din )
+    @Override
+    public List<Matrix2D> backward( List<Matrix2D> din )
     {
         List<Matrix2D> dout = new ArrayList<>( din.size() );
 

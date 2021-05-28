@@ -27,17 +27,18 @@ public class FileHandler
 
         for ( int i = from; i < to; i++ )
         {
-            TrainingVideo video = importFromFile( "dataset/out" + i + ".txt" );
+            TrainingVideo video = importFromFile( "res/dataset/out" + i + ".txt" );
 
             for ( int j = 0; j < video.getSize(); j++ )
             {
                 Map<String, Matrix2D> sample = new HashMap<>();
                 TrainingImage image = video.popImage();
-                sample.put( "X", ImageConverter.Buffered2Matrix( image.getImage() ) );
-                Matrix2D mat = new Matrix2D( 2, 1 );
-                mat.setAt( 0, 0, image.getAcceleration() );
-                mat.setAt( 1, 0, image.getDirection() );
-                sample.put( "Y", mat);
+                Matrix2D xMat = ImageConverter.Buffered2Matrix( image.getImage() ).flatten();
+                sample.put( "X", xMat );
+                Matrix2D yMat = new Matrix2D( 1, 2 );
+                yMat.setAt( 0, 0, image.getAcceleration() );
+                yMat.setAt( 0, 1, image.getDirection() );
+                sample.put( "Y", yMat);
                 data.add( sample );
             }
         }

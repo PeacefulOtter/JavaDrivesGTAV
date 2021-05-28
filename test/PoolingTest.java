@@ -59,6 +59,6 @@ class PoolingTest
 
         System.out.println( "Original: \n" + mat1 );
         System.out.println( "Forward: \n" + fw.get( 0 ));
-        System.out.println( "Backprop: \n" + p.backprop( fw ).get( 0 ));
+        System.out.println( "Backprop: \n" + p.backward( fw ).get( 0 ));
     }
 }

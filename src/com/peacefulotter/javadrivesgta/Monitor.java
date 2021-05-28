@@ -2,9 +2,6 @@ package com.peacefulotter.javadrivesgta;
 
 import com.peacefulotter.javadrivesgta.img_processing.ImageConverter;
 import com.peacefulotter.javadrivesgta.img_processing.ImageEffect;
-import com.peacefulotter.javadrivesgta.recording.TrainingImage;
-import com.peacefulotter.javadrivesgta.recording.TrainingVideo;
-import com.peacefulotter.javadrivesgta.utils.Settings;
 import com.peacefulotter.javadrivesgta.utils.Time;
 import javafx.geometry.Pos;
 import javafx.scene.image.Image;
@@ -18,7 +15,7 @@ import java.awt.image.BufferedImage;
 import static com.peacefulotter.javadrivesgta.utils.Settings.*;
 
 
-public class Monitor extends GridPane
+public final class Monitor extends GridPane implements MultiRenderer
 {
     private static final Rectangle REGION_OF_INTEREST = new Rectangle(TOP_LEFT_X, TOP_LEFT_Y, CAPTURE_WIDTH, CAPTURE_HEIGHT);
     private static Robot ROBOT;
@@ -30,7 +27,7 @@ public class Monitor extends GridPane
     private final ImageView img3 = new ImageView();
     private final ImageView img4 = new ImageView();
 
-    private TrainingVideo video;
+    private static BufferedImage current;
 
     public Monitor()
     {
@@ -38,6 +35,7 @@ public class Monitor extends GridPane
         HBox box = new HBox();
         box.getChildren().addAll(  img1, img2, img3, img4  );
         getChildren().add(box );
+        render();
     }
 
     static
@@ -53,7 +51,7 @@ public class Monitor extends GridPane
         }
     }
 
-    public BufferedImage render()
+    public void render()
     {
         // ROBOT.keyPress( KeyEvent.VK_Z );
         double startTime = Time.getNanoTime();
@@ -77,23 +75,10 @@ public class Monitor extends GridPane
         img2.setImage( finalBlack );
         img3.setImage( finalMinimap );
 
-        if ( !Settings.RECORD_CAPTURE && Math.random() < 0.05 )
-        {
-            TrainingImage trainingImage = video.popImage();
-            if ( trainingImage == null ) return capture;
-            BufferedImage image = trainingImage.getImage();
-            System.out.println("changing image " + video.getSize() + " acc: " + trainingImage.getAcceleration() + ", dir: " + trainingImage.getDirection());
-            Image img = ImageConverter.Buffered2FX( image );
-            img4.setImage( img );
-        }
-
-        return minimap;
+        Monitor.current = minimap;
     }
 
-    public void setVideo( TrainingVideo video )
-    {
-        this.video = video;
-    }
+    public static BufferedImage getCapture() { return current; }
 
     public static BufferedImage captureScreen() {
         return ROBOT.createScreenCapture(REGION_OF_INTEREST);

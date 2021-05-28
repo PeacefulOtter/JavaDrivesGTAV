@@ -13,6 +13,12 @@ public class Recording
 
     public TrainingVideo getVideo() { return video; }
 
+    public void loadVideos( int from, int to )
+    {
+        for ( int i = from; i < to; i++ )
+            addVideo(  FileHandler.importFromFile( "res/dataset/out" + i + ".txt" ) );
+    }
+
     private void saveVideoToFile()
     {
         String fileName = "out" + Recording.files + ".txt";
@@ -29,9 +35,7 @@ public class Recording
         video.addImage( trainingImage );
 
         if ( video.getSize() >= Settings.MAX_IMAGES )
-        {
             saveVideoToFile();
-        }
     }
 
     public void addVideo( TrainingVideo video )

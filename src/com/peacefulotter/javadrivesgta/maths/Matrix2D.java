@@ -91,10 +91,15 @@ public class Matrix2D
         return Matrix2D.applyFunc( (mat, i, j) -> r.nextGaussian(), rows, cols);
     }
 
+    public static Matrix2D genRandomDouble( int rows, int cols, double min, double max ) {
+        return Matrix2D.applyFunc( (mat, i, j) ->
+                ThreadLocalRandom.current().nextDouble( min, max ), rows, cols);
+    }
+
     public static Matrix2D genRandomInt( int width, int height, int min, int max )
     {
         return Matrix2D.applyFunc( (mat, i, j) ->
-                ThreadLocalRandom.current().nextInt(min, max + 1), height, width);
+                ThreadLocalRandom.current().nextInt( min, max + 1 ), height, width);
     }
 
     public Matrix2D transpose()
@@ -199,6 +204,14 @@ public class Matrix2D
         return transpose().mul(other);
     }
 
+    public Matrix2D flatten()
+    {
+        Matrix2D res = new Matrix2D( 1, cols * rows );
+        int[] index = { 0 };
+        applyFunc( (mat, i, j) -> res.m[0][index[0]++] = mat.m[i][j] );
+        return res;
+    }
+
     public Matrix2D selectRows(int a, int b) {
         Matrix2D res = new Matrix2D(b - a, cols );
         for ( int i = a; i < b; i++ )
@@ -279,8 +292,8 @@ public class Matrix2D
     public String shape()
     {
         StringJoiner sj = new StringJoiner( ", ", "(", ")" );
-        sj.add( String.valueOf( rows ) );
-        sj.add( String.valueOf( cols ) );
+        sj.add( "rows: " + rows );
+        sj.add( "cols: " + cols );
         return sj.toString();
     }
 

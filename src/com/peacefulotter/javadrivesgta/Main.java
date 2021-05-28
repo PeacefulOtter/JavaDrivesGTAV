@@ -1,8 +1,9 @@
 package com.peacefulotter.javadrivesgta;
 
-import com.peacefulotter.javadrivesgta.io.FileHandler;
+import com.peacefulotter.javadrivesgta.io.ControllerHandler;
+import com.peacefulotter.javadrivesgta.io.IOHandler;
 import com.peacefulotter.javadrivesgta.io.KeyboardHandler;
-import com.peacefulotter.javadrivesgta.recording.Recording;
+import com.peacefulotter.javadrivesgta.ml.CarManager;
 import com.peacefulotter.javadrivesgta.utils.Settings;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -23,15 +24,26 @@ public class Main extends Application
             KeyboardHandler.closeHook();
         } ) );
 
+        // INPUT HANDLERS
+        IOHandler handler;
+        if ( Settings.POLL_KEYBOARD )
+            handler = new KeyboardHandler();
+        else
+            handler = new ControllerHandler();
+
+
+        Screens screens = new Screens();
         Monitor monitor = new Monitor();
-        GameLoop gameLoop = new GameLoop( monitor );
-        Scene scene = new Scene( monitor );
-        // scene.setOnKeyPressed( Input::KeyPressedHandler );
-        // scene.setOnKeyReleased( Input::KeyReleasedHandler );
+        screens.addMultiRenderer( monitor );
+
+        CarManager task = new CarManager();
+        task.loadTrainingDataAndTrain();
+
+        GameLoop gameLoop = new GameLoop( screens, task, handler );
 
         window.setMinWidth( 500 );
         window.setMinHeight( 300 );
-        window.setScene( scene );
+        window.setScene( new Scene( screens ) );
         window.show();
 
         if ( Settings.RECORD_CAPTURE )
@@ -42,18 +54,6 @@ public class Main extends Application
                 Thread.sleep( 1000 );
             }
             System.out.println(" Starting now");
-        }
-        else
-        {
-            Recording recording = new Recording();
-            recording.addVideo(  FileHandler.importFromFile( "res/out0.txt" ) );
-            recording.addVideo(  FileHandler.importFromFile( "res/out1.txt" ) );
-            recording.addVideo(  FileHandler.importFromFile( "res/out2.txt" ) );
-            recording.addVideo(  FileHandler.importFromFile( "res/out3.txt" ) );
-            recording.addVideo(  FileHandler.importFromFile( "res/out4.txt" ) );
-            recording.addVideo(  FileHandler.importFromFile( "res/out5.txt" ) );
-            recording.addVideo(  FileHandler.importFromFile( "res/out6.txt" ) );
-            monitor.setVideo( recording.getVideo() );
         }
 
         gameLoop.start();

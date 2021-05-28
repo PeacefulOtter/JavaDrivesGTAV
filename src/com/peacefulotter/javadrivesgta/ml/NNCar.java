@@ -6,29 +6,26 @@ import com.peacefulotter.javadrivesgta.ml.activation.ActivationFunc;
 import com.peacefulotter.javadrivesgta.ml.activation.Activations;
 import com.peacefulotter.javadrivesgta.ml.loss.Loss;
 
-import java.util.HashMap;
-import java.util.function.BiFunction;
-import java.util.function.Function;
+import java.util.Map;
 
-import static com.peacefulotter.javadrivesgta.utils.Settings.CAPTURE_HEIGHT;
-import static com.peacefulotter.javadrivesgta.utils.Settings.CAPTURE_WIDTH;
+import static com.peacefulotter.javadrivesgta.utils.Settings.*;
 
-public class IACar
+public class NNCar
 {
     // Neural Network specifications (hyper parameters)
-    public static final int[] DIMENSIONS = new int[] {CAPTURE_WIDTH * CAPTURE_HEIGHT, 1000, 250, 30, 2};
-    private static final ActivationFunc[] ACTIVATIONS = new ActivationFunc[] {
+    public static final int[] DIMENSIONS = new int[] {CAPTURE_WIDTH * CAPTURE_HEIGHT, 1000, 100, 10, 2};
+    public static final ActivationFunc[] ACTIVATIONS = new ActivationFunc[] {
             Activations.ReLU, Activations.ReLU, Activations.ReLU, Activations.HyperTan
     };
 
     private NeuralNetwork nn;
 
-    public IACar()
+    public NNCar()
     {
         this.nn = new NeuralNetwork( DIMENSIONS, ACTIVATIONS );
     }
 
-    public IACar( NeuralNetwork nn )
+    public NNCar( NeuralNetwork nn )
     {
         this.nn = nn;
     }
@@ -44,29 +41,14 @@ public class IACar
         return nn.predict( data.normalize() );
     }
 
-    public void setNN( NeuralNetwork nn )
-    {
-        this.nn = nn;
-    }
-
-    public NeuralNetwork applyNNFunction( Function<Matrix2D, Matrix2D> func )
-    {
-        return nn.applyFunction( func );
-    }
-
-    public NeuralNetwork applyNNFunction( BiFunction<Matrix2D, Matrix2D, Matrix2D> func, IACar other )
-    {
-        return nn.applyFunction( func, other.nn );
-    }
-
-    public void trainIA( HashMap<String, Matrix2D> trainingData )
+    public void trainNN( Map<String, Matrix2D> trainingData )
     {
         Matrix2D X = trainingData.get( "X" );
         Matrix2D Y = trainingData.get( "Y" );
 
         if ( X.cols != DIMENSIONS[ 0 ] ) throw new AssertionError();
 
-        nn.train( X, Y, Loss.MSE, 1e-4, 250, 1, 10 );
+        nn.train( X, Y, Loss.MSE, LEARNING_RATE, EPOCHS, BATCH_SIZE, PRINT_PERIOD );
     }
 
     public NeuralNetwork getCopyNN() { return new NeuralNetwork( nn ); }

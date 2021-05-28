@@ -8,9 +8,14 @@ public class Settings
     public static final int TOP_LEFT_Y = 650;
 
     public static final boolean POLL_KEYBOARD = false;
-    public static final boolean POLL_CONTROLLER = true;
-    public static final boolean RECORD_CAPTURE = true;
+    public static final boolean POLL_CONTROLLER = !POLL_KEYBOARD;
+    public static final boolean RECORD_CAPTURE = false;
 
     public static final int MAX_IMAGES = 255; // MAX VALUE = 255
     public static final int CAPTURE_FREQUENCY = 3;
+
+    public static final double LEARNING_RATE = 0.005;
+    public static final int EPOCHS = 250;
+    public static final int BATCH_SIZE = 1;
+    public static final int PRINT_PERIOD = 10;
 }

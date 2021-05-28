@@ -5,8 +5,6 @@ import com.peacefulotter.javadrivesgta.ml.activation.ActivationFunc;
 import com.peacefulotter.javadrivesgta.ml.loss.LossFunc;
 
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 class NeuralNetwork
 {
@@ -116,9 +114,7 @@ class NeuralNetwork
 
         HashMap<Integer, HashMap<String, Matrix2D>> newParams = back_prop( criterion, z, a, y );
         for ( Integer k: newParams.keySet() )
-        {
             updateWeights( k, lr, newParams.get(k) );
-        }
 
         return a.get( layers );
     }
@@ -161,27 +157,6 @@ class NeuralNetwork
         }
     }
 
-    public NeuralNetwork applyFunction( Function<Matrix2D, Matrix2D> func )
-    {
-        NeuralNetwork nn = new NeuralNetwork( this );
-        for (int i = 1; i < layers; i++)
-        {
-            nn.setW( i, func.apply( getW(i) ) );
-            nn.setB( i, func.apply( getB(i) ) );
-        }
-        return nn;
-    }
-
-    public NeuralNetwork applyFunction( BiFunction<Matrix2D, Matrix2D, Matrix2D> func, NeuralNetwork other )
-    {
-        NeuralNetwork nn = new NeuralNetwork( this );
-        for (int i = 1; i < layers; i++)
-        {
-            nn.setW( i, func.apply( getW(i), other.getW(i) ) );
-            nn.setB( i, func.apply( getB(i), other.getB(i) ) );
-        }
-        return nn;
-    }
 
     public Matrix2D getW( int i )
     {

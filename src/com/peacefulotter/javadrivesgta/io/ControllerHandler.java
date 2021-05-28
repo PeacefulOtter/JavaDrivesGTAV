@@ -14,6 +14,8 @@ public class ControllerHandler extends IOHandler
 
     private static Controller controller;
 
+    public ControllerHandler() { init(); }
+
     public void init()
     {
         Controller[] controllers = ControllerEnvironment.getDefaultEnvironment().getControllers();

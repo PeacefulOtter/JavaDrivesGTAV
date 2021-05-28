@@ -1,10 +1,6 @@
 package com.peacefulotter.javadrivesgta;
 
-import com.peacefulotter.javadrivesgta.io.ControllerHandler;
 import com.peacefulotter.javadrivesgta.io.IOHandler;
-import com.peacefulotter.javadrivesgta.io.KeyboardHandler;
-import com.peacefulotter.javadrivesgta.recording.Recording;
-import com.peacefulotter.javadrivesgta.utils.Settings;
 import com.peacefulotter.javadrivesgta.utils.Time;
 import javafx.animation.AnimationTimer;
 
@@ -14,25 +10,18 @@ public class GameLoop extends AnimationTimer
     private static final double FRAMES_CAP = 240;
     private static final double FRAME_TIME = 1.0 / FRAMES_CAP;
 
-    private final Monitor monitor;
-    private IOHandler handler;
+    private final Screens screens;
+    private final Task task;
+    private final IOHandler handler;
 
     private int frames;
     private double framesCounter, lastTime, unprocessedTime;
 
-    private static final Recording recording = new Recording();
-
-    public GameLoop( Monitor monitor )
+    public GameLoop( Screens screens, Task task, IOHandler handler )
     {
-        this.monitor = monitor;
-
-        if ( Settings.POLL_KEYBOARD )
-            handler = new KeyboardHandler();
-        else if ( Settings.POLL_CONTROLLER )
-            handler = new ControllerHandler();
-
-        if ( handler != null )
-            handler.init();
+        this.screens = screens;
+        this.task = task;
+        this.handler = handler;
     }
 
     @Override
@@ -73,18 +62,12 @@ public class GameLoop extends AnimationTimer
         if ( render )
         {
             frames++;
-
-            if ( handler != null )
-            {
-                handler.pollInput();
-                if ( Settings.RECORD_CAPTURE && frames % Settings.CAPTURE_FREQUENCY == 0 )
-                {
-                    recording.addImage( monitor.render(), handler.getAcceleration(), handler.getDirection() );
-                    return;
-                }
-            }
-
-            monitor.render();
+            // get inputs
+            handler.pollInput();
+            // render the screen
+            screens.render();
+            // do the task
+            task.action( handler.getAcceleration(), handler.getDirection() );
         } else
         {
             try

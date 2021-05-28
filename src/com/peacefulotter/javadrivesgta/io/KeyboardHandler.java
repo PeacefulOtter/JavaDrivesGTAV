@@ -36,6 +36,8 @@ public class KeyboardHandler extends IOHandler implements NativeKeyListener
         }
     }
 
+    public KeyboardHandler() { init(); }
+
     public void init()
     {
         // Clear previous logging configurations.
