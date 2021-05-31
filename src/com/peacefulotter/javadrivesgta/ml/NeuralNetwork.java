@@ -76,26 +76,26 @@ class NeuralNetwork
         }};
     }
 
-    private HashMap<String, Matrix2D> insertParam(Matrix2D dw, Matrix2D delta) {
+    private HashMap<String, Matrix2D> insertParam(Matrix2D dw, Matrix2D db) {
         HashMap<String, Matrix2D> param = new HashMap<>();
         param.put( "dw", dw );
-        param.put( "delta", delta );
+        param.put( "db", db );
         return param;
     }
 
-    public HashMap<Integer, HashMap<String, Matrix2D>> back_prop( LossFunc loss, HashMap<Integer, Matrix2D> z, HashMap<Integer, Matrix2D> a, Matrix2D y) {
+    public HashMap<Integer, HashMap<String, Matrix2D>> backprop( LossFunc loss, HashMap<Integer, Matrix2D> z, HashMap<Integer, Matrix2D> a, Matrix2D y) {
         Matrix2D pred = a.get( layers );
-        Matrix2D delta = loss.gradient(pred, y).mul(activations.get(layers).gradient(pred));
-        Matrix2D dw = a.get( layers - 1 ).dot( delta );
+        Matrix2D db = loss.gradient(pred, y).mul(activations.get(layers).gradient(pred));
+        Matrix2D dw = a.get( layers - 1 ).dot( db );
 
         HashMap<Integer, HashMap<String, Matrix2D>> deltaParams = new HashMap<>();
-        deltaParams.put( layers - 1, insertParam( dw, delta ) );
+        deltaParams.put( layers - 1, insertParam( dw, db ) );
 
         for (int i = layers - 1; i >= 2; i--)
         {
-            delta = delta.mul(w.get(i).transpose()).mul(activations.get(i).gradient(z.get(i)));
-            dw = a.get( i - 1 ).dot( delta );
-            deltaParams.put( i - 1, insertParam( dw, delta ) );
+            db = db.mul(w.get(i).transpose()).mul(activations.get(i).gradient(z.get(i)));
+            dw = a.get( i - 1 ).dot( db );
+            deltaParams.put( i - 1, insertParam( dw, db ) );
         }
 
         return deltaParams;
@@ -103,7 +103,7 @@ class NeuralNetwork
 
     private void updateWeights(int i, double lr, HashMap<String, Matrix2D> params ) {
         w.put( i, w.get( i ).sub( params.get( "dw" ).mul( lr ) ) );
-        b.put( i, b.get( i ).sub( params.get( "delta" ).mul( lr ) ) );
+        b.put( i, b.get( i ).sub( params.get( "db" ).mul( lr ) ) );
     }
 
     public Matrix2D trainOnce( Matrix2D x, Matrix2D y, LossFunc criterion, double lr )
@@ -112,11 +112,11 @@ class NeuralNetwork
         HashMap<Integer, Matrix2D> z = f.get( "z" );
         HashMap<Integer, Matrix2D> a = f.get( "a" );
 
-        HashMap<Integer, HashMap<String, Matrix2D>> newParams = back_prop( criterion, z, a, y );
+        HashMap<Integer, HashMap<String, Matrix2D>> newParams = backprop( criterion, z, a, y );
         for ( Integer k: newParams.keySet() )
             updateWeights( k, lr, newParams.get(k) );
 
-        return a.get( layers );
+        return newParams.get( layers - 1 ).get( "dw" );
     }
 
     private int[] generateRandomIndices(int length) {

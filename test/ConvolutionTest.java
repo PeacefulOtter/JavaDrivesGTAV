@@ -1,5 +1,4 @@
 import com.peacefulotter.javadrivesgta.maths.Matrix2D;
-import com.peacefulotter.javadrivesgta.ml.activation.Activations;
 import com.peacefulotter.javadrivesgta.ml.cnn_layers.Convolution;
 
 import java.util.List;
@@ -20,7 +19,11 @@ public class ConvolutionTest
         // Matrix2D mat3 = Matrix2D.genRandomInt( 15, 15, 0, 20 );
 
         System.out.println( " ========================= Testing Simple Cases  ========================= \n" );
-        Convolution p = new Convolution( 3, 3, 1, 0, Activations.ReLU );
-        p.forward( List.of( mat1 ) );
+        Convolution p = new Convolution( 3, 3, 1, 0 );
+        System.out.println( mat1 );
+        List<Matrix2D> forw = p.forward( l1 );
+        forw.forEach( System.out::println );
+        List<Matrix2D> back = p.backward( forw, 1 );
+        back.forEach( System.out::println );
     }
 }

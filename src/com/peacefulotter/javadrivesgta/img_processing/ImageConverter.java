@@ -15,9 +15,19 @@ import static com.peacefulotter.javadrivesgta.utils.Settings.CAPTURE_WIDTH;
 
 public class ImageConverter
 {
+    /**
+     * REFACTOR THIS FUNCTION
+     * @param img
+     * @return the image in Black & White (black=0, white=255)
+     */
     public static Matrix2D Buffered2Matrix( BufferedImage img )
     {
-        return Matrix2D.applyFunc( (mat, i, j) -> img.getRGB( j, i ), CAPTURE_HEIGHT, CAPTURE_WIDTH );
+        return Matrix2D.applyFunc( (mat, i, j) -> {
+            if ( img.getRGB( j, i ) > -5 )
+                return 255;
+            else
+                return 0;
+        }, CAPTURE_HEIGHT, CAPTURE_WIDTH );
     }
 
     public static byte[] Buffered2Bytes( BufferedImage img ) throws IOException

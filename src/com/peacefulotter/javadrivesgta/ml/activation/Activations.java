@@ -21,8 +21,8 @@ public class Activations
 
         public Matrix2D gradient( Matrix2D z ) {
             return z.applyFunc( (mat, i, j) -> {
-                if ( mat.getAt( i, j ) > 0 )
-                    return  1;
+                if ( z.getAt( i, j ) > 0 )
+                    return 1;
                 else
                     return 0;
             } );

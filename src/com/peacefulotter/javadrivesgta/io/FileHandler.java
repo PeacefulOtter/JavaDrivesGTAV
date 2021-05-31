@@ -28,12 +28,11 @@ public class FileHandler
         for ( int i = from; i < to; i++ )
         {
             TrainingVideo video = importFromFile( "res/dataset/out" + i + ".txt" );
-
             for ( int j = 0; j < video.getSize(); j++ )
             {
                 Map<String, Matrix2D> sample = new HashMap<>();
                 TrainingImage image = video.popImage();
-                Matrix2D xMat = ImageConverter.Buffered2Matrix( image.getImage() ).flatten();
+                Matrix2D xMat = ImageConverter.Buffered2Matrix( image.getImage() );
                 sample.put( "X", xMat );
                 Matrix2D yMat = new Matrix2D( 1, 2 );
                 yMat.setAt( 0, 0, image.getAcceleration() );

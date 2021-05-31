@@ -18,6 +18,7 @@ public class CarManager extends Task
 
     public void loadTrainingDataAndTrain()
     {
+        System.out.println("[CarManager] (loadTrainingDataAndTrain) Loading dataset from " + FROM_FILE + " to " + TO_FILE);
         // load the training data
         List<Map<String, Matrix2D>> data = FileHandler.loadTrainingData( FROM_FILE, TO_FILE );
         // and train the car on it

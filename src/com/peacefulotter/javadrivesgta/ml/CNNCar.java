@@ -2,6 +2,7 @@ package com.peacefulotter.javadrivesgta.ml;
 
 import com.peacefulotter.javadrivesgta.maths.Matrix2D;
 import com.peacefulotter.javadrivesgta.ml.activation.ActivationFunc;
+import com.peacefulotter.javadrivesgta.ml.activation.Activations;
 import com.peacefulotter.javadrivesgta.ml.cnn_layers.Convolution;
 import com.peacefulotter.javadrivesgta.ml.cnn_layers.MaxPooling;
 import com.peacefulotter.javadrivesgta.ml.loss.Loss;
@@ -13,16 +14,16 @@ import static com.peacefulotter.javadrivesgta.utils.Settings.PRINT_PERIOD;
 
 public class CNNCar
 {
-    private static final int[] DIMENSIONS = { };
-    private static final ActivationFunc[] ACTIVATIONS = { };
+    private static final int[] DIMENSIONS = { 12350, 100, 10, 2 };
+    private static final ActivationFunc[] ACTIVATIONS = { Activations.ReLU, Activations.ReLU, Activations.ReLU, Activations.HyperTan };
     private final CNN cnn;
 
     public CNNCar()
     {
         this.cnn = new CNN.CNNBuilder()
-                .addLayer( new Convolution( 6, 3, 1, 0 ) )
+                .addLayer( new Convolution( 5, 8, 1, 0 ) )
                 .addLayer( new MaxPooling( 2, 2, 0 ) )
-                .addLayer( new Convolution( 16, 3, 1, 0 ) )
+                .addLayer( new Convolution( 10, 8, 1, 0 ) )
                 .addLayer( new MaxPooling( 2, 2, 0 ) )
                 .setNeuralNetwork( new NeuralNetwork( DIMENSIONS, ACTIVATIONS ) )
                 .build();

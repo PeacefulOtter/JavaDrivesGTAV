@@ -66,11 +66,12 @@ public class MaxPooling implements CNNLayer
 
             downsampled.add( DSImage );
         }
+
         return downsampled;
     }
 
     @Override
-    public List<Matrix2D> backward( List<Matrix2D> din )
+    public List<Matrix2D> backward( List<Matrix2D> din, double learningRate )
     {
         List<Matrix2D> dout = new ArrayList<>( din.size() );
 
@@ -95,5 +96,11 @@ public class MaxPooling implements CNNLayer
         }
 
         return dout;
+    }
+
+    @Override
+    public List<Matrix2D> getWeights()
+    {
+        return List.of();
     }
 }

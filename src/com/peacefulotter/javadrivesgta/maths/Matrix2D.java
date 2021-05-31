@@ -46,7 +46,7 @@ public class Matrix2D
      * @param func: the function
      * @return a new Matrix m = func(new Matrix(rows, cols))
      */
-    public static Matrix2D applyFunc( MatrixLambda func, int rows, int cols)
+    public static Matrix2D applyFunc( MatrixLambda func, int rows, int cols )
     {
         Matrix2D res = new Matrix2D( rows, cols );
         return res.applyFunc( func );
@@ -72,7 +72,7 @@ public class Matrix2D
 
     /**
      * Run a function 'func' to all the elements
-     * @param func: the function
+     * @param func: the function, return value not used
      */
     public void execFunc( MatrixLambda func )
     {
@@ -163,6 +163,7 @@ public class Matrix2D
         return Matrix2D.applyFunc( (mat, i, j) -> Math.pow(m[i][j], a), rows, cols);
     }
 
+
     public Matrix2D plus( Matrix2D other )
     {
         if (rows >1 && other.rows == 1 && cols == other.cols)
@@ -199,9 +200,49 @@ public class Matrix2D
         }, rows, other.cols);
     }
 
+    public Matrix2D pow( Matrix2D other )
+    {
+        return Matrix2D.applyFunc( (mat, i, j) -> Math.pow(m[i][j], other.m[i][j]), rows, cols);
+    }
+
+    public Matrix2D div( Matrix2D other )
+    {
+        return Matrix2D.applyFunc( (mat, i, j) -> m[i][j] / other.m[i][j], rows, cols);
+    }
+
     public Matrix2D dot( Matrix2D other )
     {
         return transpose().mul(other);
+    }
+
+    /**
+     * axis 1 = rows
+     */
+    public Matrix2D sumRows()
+    {
+        int[] row = { 0 };
+        return Matrix2D.applyFunc( (mat, i, j) -> {
+            double sum = 0;
+            for ( int k = 0; k < cols; k++ )
+                sum += getAt( row[0], k );
+            row[0]++;
+            return sum;
+        }, 1, cols );
+    }
+
+    /**
+     * axis 0 = cols
+     */
+    public Matrix2D sumCols()
+    {
+        int[] col = { 0 };
+        return Matrix2D.applyFunc( (mat, i, j) -> {
+            double sum = 0;
+            for ( int k = 0; k < cols; k++ )
+                sum += getAt( k, col[0] );
+            col[0]++;
+            return sum;
+        }, 1, rows );
     }
 
     public Matrix2D flatten()
@@ -230,9 +271,12 @@ public class Matrix2D
         return res.applyFunc( (mat, i, j) -> this.m[y + i][x + j] );
     }
 
-    public void subMatrix( int x, int y, int width, int height, Matrix2D src )
+    public void subMatrix( int x, int y, Matrix2D src )
     {
-        applyFunc( (mat, i, j) -> src.m[y + i][x + j] );
+        src.execFunc( (mat, i, j) -> {
+            setAt( i + y, j + x, src.getAt( i, j ) );
+            return 0;
+        } );
     }
 
     public Matrix2D shuffleRows() {
@@ -246,9 +290,30 @@ public class Matrix2D
         return Matrix2D.applyFunc( (mat, i, j) -> m[indices[i]][j], rows, cols);
     }
 
-    public double[] getRow( int i )
+    public Matrix2D reshape( int newRows, int newCols )
     {
-        return m[i];
+        if ( newRows * newCols != this.rows * this.cols )
+        {
+            System.out.println("Reshape from " + shape() + " to (" + newRows + ", " + newCols + ") is impossible");
+            return null;
+        }
+
+        int pos[] = {0, 0}; // new x, y position
+        Matrix2D res = new Matrix2D( newRows, newCols );
+        applyFunc( (mat, i, j) -> {
+            if ( pos[1] != 0 && pos[1] % newCols == 0 )
+            {
+                pos[ 0 ]++;
+                pos[ 1 ] = 0;
+            }
+            res.setAt( pos[0], pos[1]++, getAt( i, j ) );
+            return 0;
+        } );
+        return res;
+    }
+    public Matrix2D getRow( int y )
+    {
+        return applyFunc( (mat, i, j) -> m[y][j],1, cols );
     }
 
     public double getAt(int i, int j)
@@ -261,14 +326,24 @@ public class Matrix2D
         m[i][j] = val;
     }
 
-    public double mean()
+    public Matrix2D abs()
+    {
+        return Matrix2D.applyFunc( (mat, i, j) -> Math.abs( mat.m[i][j] ), rows, cols );
+    }
+
+    public double sum()
     {
         double[] res = new double[] { 0d };
         applyFunc( (m, i, j) -> {
             res[0] += getAt( i, j );
             return 0;
         } );
-        return res[0] / (rows * cols);
+        return res[0];
+    }
+
+    public double mean()
+    {
+        return sum() / (rows * cols);
     }
 
     public double variance() { return variance(mean()); }
@@ -276,7 +351,7 @@ public class Matrix2D
     public double variance(double mean)
     {
         double[] res = new double[] { 0d };
-        applyFunc( (m, i, j) -> {
+        execFunc( (m, i, j) -> {
             res[0] += Math.pow( getAt( i, j ) - mean, 2);
             return 0;
         } );

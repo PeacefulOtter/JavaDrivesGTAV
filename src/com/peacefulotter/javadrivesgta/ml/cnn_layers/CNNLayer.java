@@ -10,7 +10,9 @@ public interface CNNLayer
     {
         return origin < 0 ? 0 : Math.min( origin, max );
     }
+    default int getDepth() { return 0; }
 
     List<Matrix2D> forward( List<Matrix2D> images );
-    List<Matrix2D> backward( List<Matrix2D> din );
+    List<Matrix2D> backward( List<Matrix2D> din, double learningRate );
+    List<Matrix2D> getWeights();
 }

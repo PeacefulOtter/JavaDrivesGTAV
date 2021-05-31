@@ -7,8 +7,8 @@ class PoolingTest
 {
     public static void main( String[] args )
     {
-        // forwardTest();
-        backwardTest();
+        forwardTest();
+        // backwardTest();
     }
 
     private static void forwardTest()
@@ -59,6 +59,6 @@ class PoolingTest
 
         System.out.println( "Original: \n" + mat1 );
         System.out.println( "Forward: \n" + fw.get( 0 ));
-        System.out.println( "Backprop: \n" + p.backward( fw ).get( 0 ));
+        System.out.println( "Backprop: \n" + p.backward( fw, 1 ).get( 0 ));
     }
 }
