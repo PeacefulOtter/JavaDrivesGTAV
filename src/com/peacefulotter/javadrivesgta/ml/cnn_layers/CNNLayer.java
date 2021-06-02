@@ -1,8 +1,6 @@
 package com.peacefulotter.javadrivesgta.ml.cnn_layers;
 
-import com.peacefulotter.javadrivesgta.maths.Matrix2D;
-
-import java.util.List;
+import com.peacefulotter.javadrivesgta.maths.Matrix3D;
 
 public interface CNNLayer
 {
@@ -12,7 +10,7 @@ public interface CNNLayer
     }
     default int getDepth() { return 0; }
 
-    List<Matrix2D> forward( List<Matrix2D> images );
-    List<Matrix2D> backward( List<Matrix2D> din, double learningRate );
-    List<Matrix2D> getWeights();
+    Matrix3D forward( Matrix3D images );
+    Matrix3D backward( Matrix3D din, double learningRate );
+    Matrix3D getWeights();
 }

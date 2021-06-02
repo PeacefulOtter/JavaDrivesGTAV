@@ -1,22 +1,17 @@
 import com.peacefulotter.javadrivesgta.maths.Matrix2D;
+import com.peacefulotter.javadrivesgta.maths.Matrix3D;
 import com.peacefulotter.javadrivesgta.ml.cnn_layers.MaxPooling;
-
-import java.util.List;
+import org.junit.Test;
 
 class PoolingTest
 {
-    public static void main( String[] args )
+    @Test
+    public void forwardTest()
     {
-        forwardTest();
-        // backwardTest();
-    }
-
-    private static void forwardTest()
-    {
-        Matrix2D mat1 = Matrix2D.genRandomInt( 14, 10, 0, 20 );
-        Matrix2D mat2 = Matrix2D.genRandomInt( 11, 9, 0, 20 );
-        List<Matrix2D> l1  = List.of( mat1 );
-        List<Matrix2D> l2  = List.of( mat2 );
+        Matrix3D l1  = new Matrix3D( 10, 14, 1 );
+        l1.setMatrix( 0, Matrix2D.genRandomInt( 14, 10, 0, 20 ) );
+        Matrix3D l2  = new Matrix3D( 9, 11, 1 );
+        l2.setMatrix( 0, Matrix2D.genRandomInt( 11, 9, 0, 20 ) );
         // Matrix2D mat3 = Matrix2D.genRandomInt( 15, 15, 0, 20 );
 
         System.out.println(" ========================= Testing Simple Cases  ========================= \n");
@@ -51,14 +46,16 @@ class PoolingTest
         p.forward( l1 );
     }
 
-    private static void backwardTest()
+    @Test
+    public void backwardTest()
     {
-        Matrix2D mat1 = Matrix2D.genRandomInt( 14, 10, 0, 20 );
+        Matrix3D l1  = new Matrix3D( 10, 14, 1 );
+        l1.setMatrix( 0, Matrix2D.genRandomInt( 14, 10, 0, 20 ) );
         MaxPooling p = new MaxPooling( 2, 2, 0 );
-        List<Matrix2D> fw = p.forward( List.of(mat1) );
+        Matrix3D fw = p.forward( l1 );
 
-        System.out.println( "Original: \n" + mat1 );
-        System.out.println( "Forward: \n" + fw.get( 0 ));
-        System.out.println( "Backprop: \n" + p.backward( fw, 1 ).get( 0 ));
+        System.out.println( "Original: \n" + l1 );
+        System.out.println( "Forward: \n" + fw.getMatrix( 0 ));
+        System.out.println( "Backprop: \n" + p.backward( fw, 1 ).getMatrix( 0 ));
     }
 }

@@ -6,10 +6,15 @@ import java.util.Collections;
 import java.util.Random;
 import java.util.StringJoiner;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.IntStream;
 
 
 public class Matrix2D
 {
+    private static final boolean ALLOW_PARALLEL = true;
+    private static final int CORES = Math.max( 2, Math.min( 4, Runtime.getRuntime().availableProcessors() ) );
+    private static final int PARALLEL_THRESHOLD = 400 * 400;
+
     private final double[][] m;
     public final int rows, cols;
 
@@ -46,7 +51,7 @@ public class Matrix2D
      * @param func: the function
      * @return a new Matrix m = func(new Matrix(rows, cols))
      */
-    public static Matrix2D applyFunc( MatrixLambda func, int rows, int cols )
+    public static Matrix2D applyFunc( Matrix2DLambda func, int rows, int cols )
     {
         Matrix2D res = new Matrix2D( rows, cols );
         return res.applyFunc( func );
@@ -57,7 +62,7 @@ public class Matrix2D
      * @param func: the function
      * @return a new Matrix m = func(this)
      */
-    public Matrix2D applyFunc( MatrixLambda func )
+    public Matrix2D applyFunc( Matrix2DLambda func )
     {
         Matrix2D res = new Matrix2D( rows, cols );
         for ( int i = 0; i < rows; i++ )
@@ -74,15 +79,33 @@ public class Matrix2D
      * Run a function 'func' to all the elements
      * @param func: the function, return value not used
      */
-    public void execFunc( MatrixLambda func )
+    public void execFunc( Matrix2DLambdaExec func )
     {
         for ( int i = 0; i < rows; i++ )
         {
             for ( int j = 0; j < cols; j++ )
             {
-                func.apply( this, i, j );
+                func.apply( i, j );
             }
         }
+    }
+
+    public void paraExecFunc( Matrix2DLambda func )
+    {
+        int slice = rows / CORES;
+        int rest = rows % CORES;
+
+        IntStream.range(1, CORES + 1).parallel().forEach( core -> {
+            System.out.println(((core - 1) * slice) + " " + ( core * slice));
+            for ( int i = (core - 1) * slice; i < core * slice; i++ )
+                for ( int j = 0; j < cols; j++ )
+                    func.apply( this, i, j );
+            }
+        );
+
+        for ( int i = rows - rest; i < rows; i++ )
+            for ( int j = 0; j < cols; j++ )
+                func.apply( this, i, j );
     }
 
 
@@ -119,14 +142,13 @@ public class Matrix2D
     public ElemIndices max()
     {
         ElemIndices res = new ElemIndices( -Double.MAX_VALUE, 0, 0 );
-        execFunc( (m, i, j) -> {
+        execFunc( (i, j) -> {
             if ( getAt( i, j ) > res.elem )
             {
                 res.elem = getAt( i, j );
                 res.x = j;
                 res.y = i;
             }
-            return 0;
         } );
         return res;
     }
@@ -273,10 +295,9 @@ public class Matrix2D
 
     public void subMatrix( int x, int y, Matrix2D src )
     {
-        src.execFunc( (mat, i, j) -> {
-            setAt( i + y, j + x, src.getAt( i, j ) );
-            return 0;
-        } );
+        src.execFunc( (i, j) ->
+            setAt( i + y, j + x, src.getAt( i, j ) )
+        );
     }
 
     public Matrix2D shuffleRows() {
@@ -288,6 +309,13 @@ public class Matrix2D
     public Matrix2D shuffleRows(int[] indices) {
         if ( indices.length != rows ) throw new AssertionError();
         return Matrix2D.applyFunc( (mat, i, j) -> m[indices[i]][j], rows, cols);
+    }
+
+    // same as np.expand_dims(x, axis=1)
+    public Matrix3D expandDims()
+    {
+        Matrix3D res = new Matrix3D( 1, cols, rows );
+        return res.applyFunc( (mat, d, r, c) -> m[d][c] );
     }
 
     public Matrix2D reshape( int newRows, int newCols )
@@ -311,9 +339,15 @@ public class Matrix2D
         } );
         return res;
     }
+
     public Matrix2D getRow( int y )
     {
         return applyFunc( (mat, i, j) -> m[y][j],1, cols );
+    }
+
+    public Matrix2D getCol( int x )
+    {
+        return applyFunc( (mat, i, j) -> m[i][x], rows, 1 );
     }
 
     public double getAt(int i, int j)
@@ -351,7 +385,7 @@ public class Matrix2D
     public double variance(double mean)
     {
         double[] res = new double[] { 0d };
-        execFunc( (m, i, j) -> {
+        applyFunc( (m, i, j) -> {
             res[0] += Math.pow( getAt( i, j ) - mean, 2);
             return 0;
         } );

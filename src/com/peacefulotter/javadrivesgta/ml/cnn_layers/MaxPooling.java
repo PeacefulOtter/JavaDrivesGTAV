@@ -1,10 +1,9 @@
 package com.peacefulotter.javadrivesgta.ml.cnn_layers;
 
 import com.peacefulotter.javadrivesgta.maths.Matrix2D;
+import com.peacefulotter.javadrivesgta.maths.Matrix3D;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Queue;
 
 public class MaxPooling implements CNNLayer
@@ -23,13 +22,13 @@ public class MaxPooling implements CNNLayer
     }
 
     @Override
-    public List<Matrix2D> forward( List<Matrix2D> images )
+    public Matrix3D forward( Matrix3D images )
     {
+        System.out.println("[MaxPooling] images shape: " + images.shape() );
         maxIndices.clear();
-        List<Matrix2D> downsampled = new ArrayList<>( images.size() );
 
-        int baseHeight = images.get( 0 ).rows;
-        int baseWidth  = images.get( 0 ).cols;
+        int baseHeight = images.rows;
+        int baseWidth  = images.cols;
 
         // save the images shape for the backward propagation
         shapeX = baseWidth;
@@ -39,6 +38,9 @@ public class MaxPooling implements CNNLayer
         int h = 1 + (baseHeight - kernelSize + 2 * padding) / stride;
         int w = 1 + (baseWidth  - kernelSize + 2 * padding) / stride;
 
+        Matrix3D downsampled = new Matrix3D( h, w, images.depth );
+
+        int a = 0;
         for ( Matrix2D image: images )
         {
             Matrix2D DSImage = new Matrix2D( h, w );
@@ -64,17 +66,21 @@ public class MaxPooling implements CNNLayer
                 j += 1;
             }
 
-            downsampled.add( DSImage );
+            downsampled.setMatrix( a++, DSImage );
         }
 
         return downsampled;
     }
 
     @Override
-    public List<Matrix2D> backward( List<Matrix2D> din, double learningRate )
+    public Matrix3D backward( Matrix3D din, double learningRate )
     {
-        List<Matrix2D> dout = new ArrayList<>( din.size() );
+        System.out.println("[MaxPooling] din shape: " + din.shape() + ", " + shapeX + " " + shapeY);
+        Matrix3D dout = new Matrix3D( shapeY, shapeX, din.depth );
 
+        System.out.println( maxIndices.size() );
+
+        int a = 0;
         for ( Matrix2D image: din )
         {
             Matrix2D DSImage = new Matrix2D( shapeY, shapeX );
@@ -92,15 +98,17 @@ public class MaxPooling implements CNNLayer
                 j++;
             }
 
-            dout.add( DSImage );
+            dout.setMatrix( a++, DSImage );
         }
+
+        System.out.println( maxIndices.size() );
 
         return dout;
     }
 
     @Override
-    public List<Matrix2D> getWeights()
+    public Matrix3D getWeights()
     {
-        return List.of();
+        return new Matrix3D( 0, 0, 0 );
     }
 }

@@ -116,7 +116,7 @@ class NeuralNetwork
         for ( Integer k: newParams.keySet() )
             updateWeights( k, lr, newParams.get(k) );
 
-        return newParams.get( layers - 1 ).get( "dw" );
+        return newParams.get( 1 ).get( "dw" );
     }
 
     private int[] generateRandomIndices(int length) {

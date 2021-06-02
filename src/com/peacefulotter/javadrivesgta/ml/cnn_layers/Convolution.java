@@ -1,18 +1,15 @@
 package com.peacefulotter.javadrivesgta.ml.cnn_layers;
 
 import com.peacefulotter.javadrivesgta.maths.Matrix2D;
+import com.peacefulotter.javadrivesgta.maths.Matrix3D;
 import com.peacefulotter.javadrivesgta.ml.activation.Activations;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Convolution implements CNNLayer
 {
     private final int depth, kernelSize, stride, padding;
-    private final List<Matrix2D> filters;
+    private final Matrix3D filters;
 
-    private List<Matrix2D> lastImages;
-    private int srcHeight, srcWidth;
+    private Matrix3D lastImages;
 
     public Convolution( int depth, int kernelSize, int stride, int padding )
     {
@@ -21,24 +18,22 @@ public class Convolution implements CNNLayer
         this.stride = stride;
         this.padding = padding;
 
-        this.filters = new ArrayList<>( depth );
+        this.filters = new Matrix3D( kernelSize, kernelSize, depth );
         for ( int i = 0; i < depth; i++ )
-            filters.add( Matrix2D.genRandomDouble( kernelSize, kernelSize, -1, 1 ) );
+            filters.setMatrix( i, Matrix2D.genRandomDouble( kernelSize, kernelSize, -1, 1 ) );
     }
 
     @Override
-    public List<Matrix2D> forward( List<Matrix2D> images )
+    public Matrix3D forward( Matrix3D images )
     {
-        List<Matrix2D> convoluted = new ArrayList<>( depth * images.size() );
-        lastImages = new ArrayList<>( images );
-
-        srcHeight = images.get( 0 ).rows;
-        srcWidth  = images.get( 0 ).cols;
+        lastImages = new Matrix3D( images );
 
         // Output dimensions after the Convolution
-        int h = 1 + (srcHeight - kernelSize + 2 * padding) / stride;
-        int w = 1 + (srcWidth  - kernelSize + 2 * padding) / stride;
+        int h = 1 + (images.rows - kernelSize + 2 * padding) / stride;
+        int w = 1 + (images.cols  - kernelSize + 2 * padding) / stride;
 
+        Matrix3D convoluted = new Matrix3D( h, w, depth * images.depth );
+        int a = 0;
         for ( Matrix2D image: images )
         {
             for ( Matrix2D filter: filters )
@@ -52,10 +47,10 @@ public class Convolution implements CNNLayer
                     for ( int y = -padding; y < image.rows + padding && i < h; y += stride )
                     {
                         // coordinates to avoid OutOfBounds Exceptions
-                        int matX = bounded( x, srcWidth );
-                        int matY = bounded( y, srcHeight );
-                        int matWidth = bounded(x + kernelSize, srcWidth ) - matX;
-                        int matHeight = bounded(y + kernelSize, srcHeight ) - matY;
+                        int matX = bounded( x, lastImages.cols );
+                        int matY = bounded( y, lastImages.rows );
+                        int matWidth = bounded(x + kernelSize, lastImages.cols ) - matX;
+                        int matHeight = bounded(y + kernelSize, lastImages.rows ) - matY;
                         // get the part of the matrix we want and take its maximum
                         Matrix2D patch = image.subMatrix( matX, matY, matWidth, matHeight );
 
@@ -72,7 +67,7 @@ public class Convolution implements CNNLayer
                 }
 
                 Matrix2D activatedConv = Activations.ReLU.forward( conv );
-                convoluted.add( activatedConv );
+                convoluted.setMatrix( a++, activatedConv );
             }
         }
 
@@ -85,37 +80,38 @@ public class Convolution implements CNNLayer
      * @return A list of size 1 representing the backward propagation of a convolution step
      */
     @Override
-    public List<Matrix2D> backward( List<Matrix2D> gradients, double learningRate )
+    public Matrix3D backward( Matrix3D gradients, double learningRate )
     {
-        List<Matrix2D> backprop = new ArrayList<>();
-        List<Matrix2D> dHs = new ArrayList<>();
+        Matrix3D backprop = new Matrix3D( gradients.rows, gradients.cols, gradients.depth );
+        Matrix3D dHs =  new Matrix3D( gradients.rows, gradients.cols, gradients.depth );
 
+        int a = 0;
         for ( Matrix2D grad: gradients )
-            dHs.add( Activations.ReLU.gradient( grad ) );
+            dHs.setMatrix( a++, Activations.ReLU.gradient( grad ) );
 
-        int gradWidth = dHs.get( 0 ).cols;
-        int gradHeight = dHs.get( 0 ).rows;
-
+        int gradWidth = dHs.cols;
+        int gradHeight = dHs.rows;
+        a = 0;
         for ( Matrix2D lastImage: lastImages )
         {
-            for ( int f = 0; f < filters.size(); f++ )
+            for ( int f = 0; f < filters.depth; f++ )
             {
-                Matrix2D filter = filters.get( f );
-                Matrix2D dH = dHs.get( f );
-                Matrix2D deltaImage = new Matrix2D( srcHeight, srcWidth ); // input image delta (dX)
+                Matrix2D filter = filters.getMatrix( f );
+                Matrix2D dH = dHs.getMatrix( f );
+                Matrix2D deltaImage = new Matrix2D( lastImage.rows, lastImage.cols ); // input image delta (dX)
                 Matrix2D deltaFilter = new Matrix2D( kernelSize, kernelSize ); // filter delta (dW)
 
                 int j = 0;
-                for ( int x = -padding; x < srcWidth + padding && j < gradWidth; x += stride )
+                for ( int x = -padding; x < lastImage.cols + padding && j < gradWidth; x += stride )
                 {
                     int i = 0;
-                    for ( int y = -padding; y < srcWidth + padding && i < gradHeight; y += stride )
+                    for ( int y = -padding; y < lastImage.rows + padding && i < gradHeight; y += stride )
                     {
                         // coordinates to avoid OutOfBounds Exceptions
-                        int matX = bounded( x, srcWidth );
-                        int matY = bounded( y, srcHeight );
-                        int matWidth = bounded(x + kernelSize, srcWidth ) - matX;
-                        int matHeight = bounded(y + kernelSize, srcHeight ) - matY;
+                        int matX = bounded( x, lastImages.cols );
+                        int matY = bounded( y, lastImages.rows );
+                        int matWidth = bounded(x + kernelSize, lastImages.cols ) - matX;
+                        int matHeight = bounded(y + kernelSize, lastImages.rows ) - matY;
 
                         // get the part of the matrix we want and take its maximum
                         Matrix2D patch = lastImage.subMatrix( matX, matY, matWidth, matHeight );
@@ -137,7 +133,7 @@ public class Convolution implements CNNLayer
                 }
 
                 filter.sub( deltaFilter.mul( learningRate ) ); // update filters
-                backprop.add( deltaImage );
+                backprop.setMatrix( a, deltaImage );
             }
         }
 
@@ -145,7 +141,7 @@ public class Convolution implements CNNLayer
     }
 
     @Override
-    public List<Matrix2D> getWeights()
+    public Matrix3D getWeights()
     {
         return filters;
     }
