@@ -38,7 +38,7 @@ public class ControllerHandler extends IOHandler
         EventQueue queue = controller.getEventQueue();
         Event event = new Event();
 
-        // Polls axes for data. Returns false if the controller is no longer valid.
+        // Poll axes for data. Returns false if the controller is no longer valid.
         // Polling reflects the current state of the device when polled.
         if ( !controller.poll() )
             throw new UnsupportedOperationException( "Controller cannot poll axis data" );
