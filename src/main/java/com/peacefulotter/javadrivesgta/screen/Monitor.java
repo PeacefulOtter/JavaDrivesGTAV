@@ -1,4 +1,4 @@
-package com.peacefulotter.javadrivesgta;
+package com.peacefulotter.javadrivesgta.screen;
 
 import com.peacefulotter.javadrivesgta.img_processing.ImageConverter;
 import com.peacefulotter.javadrivesgta.img_processing.ImageEffect;

@@ -1,15 +1,21 @@
 package com.peacefulotter.javadrivesgta.recording;
 
 import com.peacefulotter.javadrivesgta.io.FileHandler;
+import com.peacefulotter.javadrivesgta.task.Task;
 import com.peacefulotter.javadrivesgta.utils.Settings;
 
 import java.awt.image.BufferedImage;
+import java.lang.reflect.RecordComponent;
 
-public class Recording
+public class Recording extends Task
 {
-    private static int files = 0; // number of files saved
+    private int files; // number of files saved
+    private final TrainingVideo video;
 
-    private final TrainingVideo video = new TrainingVideo();
+    public Recording() {
+        this.files = 0;
+        this.video = new TrainingVideo();
+    }
 
     public TrainingVideo getVideo() { return video; }
 
@@ -21,9 +27,9 @@ public class Recording
 
     private void saveVideoToFile()
     {
-        String fileName = "out" + Recording.files + ".txt";
+        String fileName = "out" + files + ".txt";
         FileHandler.writeToFile( video, fileName );
-        Recording.files += 1;
+        files += 1;
     }
 
     public void addImage( BufferedImage image, int acceleration, int direction )
@@ -45,5 +51,10 @@ public class Recording
         {
             this.video.addImage( image );
         }
+    }
+
+    @Override
+    public void action() {
+
     }
 }

@@ -1,7 +1,7 @@
-package com.peacefulotter.javadrivesgta.ml;
+package com.peacefulotter.javadrivesgta.task;
 
-import com.peacefulotter.javadrivesgta.Monitor;
-import com.peacefulotter.javadrivesgta.Task;
+import com.peacefulotter.javadrivesgta.ml.CNNCar;
+import com.peacefulotter.javadrivesgta.screen.Monitor;
 import com.peacefulotter.javadrivesgta.img_processing.ImageConverter;
 import com.peacefulotter.javadrivesgta.io.FileHandler;
 import com.peacefulotter.javadrivesgta.maths.Matrix2D;
@@ -27,8 +27,9 @@ public class CarManager extends Task
     }
 
     @Override
-    public void action( int acc, int dir )
+    public void action()
     {
+        // Control.HANDLER.getAcceleration(), Control.HANDLER.getDirection()
         Matrix2D inputImage = ImageConverter.Buffered2Matrix( Monitor.getCapture() );
         Matrix2D sim = this.car.simulate( inputImage );
         // simulate controller inputs;

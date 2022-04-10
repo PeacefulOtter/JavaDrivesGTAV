@@ -17,4 +17,8 @@ module JavaDrivesGTAV {
 
     opens com.peacefulotter.javadrivesgta to javafx.fxml;
     exports com.peacefulotter.javadrivesgta;
+    exports com.peacefulotter.javadrivesgta.screen;
+    opens com.peacefulotter.javadrivesgta.screen to javafx.fxml;
+    exports com.peacefulotter.javadrivesgta.task;
+    opens com.peacefulotter.javadrivesgta.task to javafx.fxml;
 }

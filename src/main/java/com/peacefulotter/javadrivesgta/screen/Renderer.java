@@ -1,4 +1,4 @@
-package com.peacefulotter.javadrivesgta;
+package com.peacefulotter.javadrivesgta.screen;
 
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;

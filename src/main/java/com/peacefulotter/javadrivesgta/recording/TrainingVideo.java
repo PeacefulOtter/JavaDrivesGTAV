@@ -1,6 +1,6 @@
 package com.peacefulotter.javadrivesgta.recording;
 
-import com.peacefulotter.javadrivesgta.Renderer;
+import com.peacefulotter.javadrivesgta.screen.Renderer;
 import com.peacefulotter.javadrivesgta.img_processing.ImageConverter;
 import javafx.scene.image.Image;
 

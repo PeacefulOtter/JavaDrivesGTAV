@@ -1,4 +1,4 @@
-package com.peacefulotter.javadrivesgta;
+package com.peacefulotter.javadrivesgta.screen;
 
 public interface MultiRenderer
 {

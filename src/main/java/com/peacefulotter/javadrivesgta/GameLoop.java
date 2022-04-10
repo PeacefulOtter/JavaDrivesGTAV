@@ -1,6 +1,7 @@
 package com.peacefulotter.javadrivesgta;
 
-import com.peacefulotter.javadrivesgta.io.IOHandler;
+import com.peacefulotter.javadrivesgta.screen.Screens;
+import com.peacefulotter.javadrivesgta.task.Task;
 import com.peacefulotter.javadrivesgta.utils.Time;
 import javafx.animation.AnimationTimer;
 
@@ -12,16 +13,14 @@ public class GameLoop extends AnimationTimer
 
     private final Screens screens;
     private final Task task;
-    private final IOHandler handler;
 
     private int frames;
     private double framesCounter, lastTime, unprocessedTime;
 
-    public GameLoop( Screens screens, Task task, IOHandler handler )
+    public GameLoop( Screens screens, Task task )
     {
         this.screens = screens;
         this.task = task;
-        this.handler = handler;
     }
 
     @Override
@@ -63,11 +62,11 @@ public class GameLoop extends AnimationTimer
         {
             frames++;
             // get inputs
-            handler.pollInput();
+            Control.HANDLER.pollInput();
             // render the screen
             screens.render();
             // do the task
-            task.action( handler.getAcceleration(), handler.getDirection() );
+            task.action();
         } else
         {
             try

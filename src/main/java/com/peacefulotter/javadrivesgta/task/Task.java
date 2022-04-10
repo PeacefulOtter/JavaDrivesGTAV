@@ -1,4 +1,4 @@
-package com.peacefulotter.javadrivesgta;
+package com.peacefulotter.javadrivesgta.task;
 
 /**
  * Represents something that the GameLoop will do every frame
@@ -6,5 +6,5 @@ package com.peacefulotter.javadrivesgta;
  */
 public abstract class Task
 {
-    public abstract void action( int acc, int dir );
+    public abstract void action();
 }
